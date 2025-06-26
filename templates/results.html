@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clustered Food Reviews</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .dropdown {
+            margin: 20px auto;
+            width: 300px;
+            text-align: center;
+        }
+        select {
+            padding: 10px;
+            font-size: 16px;
+            width: 100%;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            cursor: pointer;
+        }
+        select:hover {
+            border-color: #3498db;
+        }
+        .topic-content {
+            display: none;
+            margin-top: 20px;
+        }
+        .topic-content.active {
+            display: block;
+        }
+        h2 {
+            color: #2980b9;
+            background-color: #ecf0f1;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        h3 {
+            color: #27ae60;
+            margin-left: 10px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background-color: #fff;
+            margin: 5px 0;
+            padding: 10px;
+            border-left: 4px solid #e74c3c; /* Default to orange for neutral */
+            border-radius: 3px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        li.positive {
+            border-left-color: #27ae60; /* Green for positive */
+        }
+        li.negative {
+            border-left-color: #e74c3c; /* Red for negative */
+        }
+        li:hover {
+            background-color: #f9f9f9;
+            border-left-color: #3498db;
+        }
+        .sentiment {
+            font-weight: bold;
+            color: #8e44ad;
+        }
+        .error {
+            color: #e74c3c;
+            text-align: center;
+            font-size: 1.2em;
+            padding: 20px;
+            background-color: #fff;
+            border-left: 4px solid #e74c3c;
+            border-radius: 3px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            width: 400px;
+            margin: 0 auto;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropdown = document.getElementById('topic-dropdown');
+            const contents = document.getElementsByClassName('topic-content');
+
+            dropdown.addEventListener('change', function() {
+                for (let content of contents) {
+                    content.classList.remove('active');
+                }
+                const selectedId = dropdown.value;
+                if (selectedId) {
+                    document.getElementById(selectedId).classList.add('active');
+                }
+            });
+
+            if (contents.length > 0) {
+                dropdown.value = Object.keys(contents)[0];
+                contents[0].classList.add('active');
+            }
+        });
+    </script>
+</head>
+<body>
+    {% if clusters.get('Error') %}
+        <div class="error">
+            <h1>Error</h1>
+            {{ message }}
+        </div>
+    {% else %}
+        <div class="dropdown">
+            <select id="topic-dropdown">
+                <option value="" disabled selected>Select a Food Item</option>
+                {% for topic in clusters.keys() %}
+                    <option value="{{ topic | replace(' ', '_') }}">{{ topic }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        {% for topic in clusters.keys() %}
+            <div id="{{ topic | replace(' ', '_') }}" class="topic-content">
+                <h2>{{ topic }}</h2>
+                <h3>Sentiment Distribution</h3>
+                <ul>
+                    {% for sentiment, count in clusters[topic].sentiment_distribution.items() %}
+                        <li><span class="sentiment">{{ sentiment }}</span>: {{ count }}</li>
+                    {% endfor %}
+                </ul>
+                <h3>Reviews</h3>
+                <ul>
+                    {% for review in clusters[topic].reviews %}
+                        {% set sentiment = df[df['Review'] == review]['sentiment'].iloc[0] if review in df['Review'].values else 'neutral' %}
+                        <li class="{{ sentiment }}">{{ review | safe }} <span class="sentiment">(Sentiment: {{ sentiment }})</span></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+    {% endif %}
+</body>
+</html>
