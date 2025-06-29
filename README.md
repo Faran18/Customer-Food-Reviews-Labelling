@@ -20,7 +20,7 @@ To run this project successfully, make sure you have the following installed:
    Run the following in your terminal:
 
    ```bash
-   git clone https://github.com/Faran18/Customer-Food-Reviews-Labelling.git
+   git clone https://github.com/Faran18Food-Review-Clustering-and-Sentiment-Analysis.git
    cd Customer-Food-Reviews-Labelling
    ```
 
