@@ -1,4 +1,4 @@
-## 🍽️ **Customer-Food-Reviews-Labelling**
+## 🍽️ **Food Review Clustering and Sentiment Analysis**
 
 A Flask-based web application designed to cluster and analyze food reviews based on sentiment and food item mentions.
 The app processes CSV files containing reviews, groups them by food items (e.g., ratatouille, ceviche), and applies sentiment analysis using **VADER** to classify reviews as positive, neutral, or negative.
